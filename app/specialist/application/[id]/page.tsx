@@ -1,4 +1,4 @@
-import ApplicationReview from '@/components/specialist/ApplicationReview';
+import ApplicationReview from './ApplicationReview';
 
 export async function generateStaticParams() {
   return [
@@ -8,6 +8,6 @@ export async function generateStaticParams() {
   ];
 }
 
-export default function ApplicationReviewPage({ params }: PageProps) {
-  return <ApplicationReview applicationId={params.id as string} />;
+export default function ApplicationReviewPage({ params }: { params: { id: string } }) {
+  return <ApplicationReview applicationId={params.id} />;
 }

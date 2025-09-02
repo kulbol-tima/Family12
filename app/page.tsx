@@ -264,7 +264,7 @@ export default function Home() {
       <footer className="bg-gray-900 text-white py-8 px-6">
         <div className="container mx-auto text-center">
           <p className="mb-2"> 2025 Министерство труда и социального развития КР</p>
-          <p className="text-gray-400 text-sm">Система "Үй-бүлөгө көмөк"</p>
+          <p className="text-gray-400 text-sm">Система &quot;Үй-бүлөгө көмөк&quot;</p>
         </div>
       </footer>
     </div>

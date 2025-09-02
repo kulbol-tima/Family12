@@ -1,11 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { calculateBenefit, BenefitCalculation } from '@/lib/benefitCalculator';
-import { approvalReasons, rejectionReasons, inspectionReasons } from '@/lib/mockData';
-import { useLanguage } from '@/contexts/LanguageContext';
+import { useState, useEffect, useCallback } from 'react';
 
 interface DecisionMakingToolsProps {
+  language: string;
   application: any;
   family: any;
   riskAssessment?: any;
@@ -13,27 +11,91 @@ interface DecisionMakingToolsProps {
 }
 
 export default function DecisionMakingTools({ 
+  language,
   application, 
   family, 
   riskAssessment,
   onDecision 
 }: DecisionMakingToolsProps) {
-  const { language } = useLanguage();
   const [isClient, setIsClient] = useState(false);
-  const [calculatedBenefit, setCalculatedBenefit] = useState<BenefitCalculation | null>(null);
+  const [calculatedBenefit, setCalculatedBenefit] = useState({
+    baseAmount: 0,
+    regionalCoefficient: 1.0,
+    borderBonus: 0,
+    finalAmount: 0
+  });
   const [selectedReason, setSelectedReason] = useState('');
   const [comment, setComment] = useState('');
+  const [requiresSupervisor, setRequiresSupervisor] = useState(false);
 
   useEffect(() => {
     setIsClient(true);
-    if (family && application) {
-      const benefit = calculateBenefit(family.members, application.region.toLowerCase(), family.totalIncome);
-      setCalculatedBenefit(benefit);
+    calculateBenefit();
+  }, [calculateBenefit]);
+
+  if (!isClient) return null;
+
+  const calculateBenefit = useCallback(() => {
+    const childrenUnder16 = application?.childrenCount || 0;
+    const basePerChild = 1200;
+    const baseAmount = basePerChild * childrenUnder16;
+
+    let coefficient = 1.0;
+    let bonus = 0;
+
+    // Regional coefficients
+    switch (application?.region) {
+      case 'Бишкек':
+      case 'Bishkek':
+        coefficient = 1.0;
+        break;
+      case 'Нарын':
+      case 'Naryn':
+        coefficient = 1.2;
+        break;
+      case 'Баткен':
+      case 'Batken':
+        coefficient = 1.25;
+        bonus = 1000 * childrenUnder16; // Border bonus
+        break;
+      default:
+        coefficient = 1.0;
     }
-  }, [family, application]);
 
-  if (!isClient || !calculatedBenefit) return null;
+    const finalAmount = Math.round((baseAmount * coefficient) + bonus);
 
+    setCalculatedBenefit({
+      baseAmount,
+      regionalCoefficient: coefficient,
+      borderBonus: bonus,
+      finalAmount
+    });
+
+    // Check if supervisor approval required for amounts > 3000
+    setRequiresSupervisor(finalAmount > 3000);
+  }, [application]);
+
+  const approvalReasons = [
+    { value: 'INCOME_ELIGIBLE', text: language === 'ru' ? 'Доходы соответствуют критериям' : 'Income meets eligibility criteria' },
+    { value: 'DOCUMENTS_COMPLETE', text: language === 'ru' ? 'Документы полные и корректные' : 'Documents complete and correct' },
+    { value: 'FAMILY_VERIFIED', text: language === 'ru' ? 'Состав семьи подтвержден' : 'Family composition verified' },
+    { value: 'EXTERNAL_CHECKS_PASSED', text: language === 'ru' ? 'Внешние проверки пройдены' : 'External checks passed' }
+  ];
+
+  const rejectionReasons = [
+    { value: 'INCOME_EXCEEDS', text: language === 'ru' ? 'Доходы превышают лимит ГМД' : 'Income exceeds GMD limit' },
+    { value: 'INCOMPLETE_DOCUMENTS', text: language === 'ru' ? 'Неполный пакет документов' : 'Incomplete document package' },
+    { value: 'FALSE_INFORMATION', text: language === 'ru' ? 'Предоставлена ложная информация' : 'False information provided' },
+    { value: 'NO_ELIGIBLE_CHILDREN', text: language === 'ru' ? 'Нет детей до 16 лет' : 'No children under 16' },
+    { value: 'DUPLICATE_APPLICATION', text: language === 'ru' ? 'Дублирующая заявка' : 'Duplicate application' }
+  ];
+
+  const inspectionReasons = [
+    { value: 'HIGH_RISK', text: language === 'ru' ? 'Высокий риск мошенничества' : 'High fraud risk' },
+    { value: 'INCOME_VERIFICATION', text: language === 'ru' ? 'Требуется проверка доходов' : 'Income verification needed' },
+    { value: 'FAMILY_COMPOSITION', text: language === 'ru' ? 'Проверка состава семьи' : 'Family composition check' },
+    { value: 'LIVING_CONDITIONS', text: language === 'ru' ? 'Оценка жилищных условий' : 'Living conditions assessment' }
+  ];
 
   const handleApprove = () => {
     if (!selectedReason || !comment.trim()) {
@@ -77,7 +139,7 @@ export default function DecisionMakingTools({
                 </div>
                 <div className="flex justify-between font-semibold pt-2 border-t border-blue-200">
                   <span>{language === 'ru' ? 'Базовая сумма:' : 'Base amount:'}</span>
-                  <span suppressHydrationWarning={true}>{calculatedBenefit.baseBenefit.toLocaleString()} сом</span>
+                  <span suppressHydrationWarning={true}>{calculatedBenefit.baseAmount.toLocaleString()} сом</span>
                 </div>
               </div>
             </div>
@@ -110,13 +172,13 @@ export default function DecisionMakingTools({
               {language === 'ru' ? 'Итоговая сумма пособия' : 'Final Benefit Amount'}
             </h5>
             <div className="text-4xl font-bold text-emerald-600 mb-2" suppressHydrationWarning={true}>
-              {calculatedBenefit.totalMonthlyBenefit.toLocaleString()}
+              {calculatedBenefit.finalAmount.toLocaleString()}
             </div>
             <div className="text-emerald-700 text-lg font-medium mb-4">
               {language === 'ru' ? 'сомов в месяц' : 'soms per month'}
             </div>
             
-            {calculatedBenefit.requiresSupervisorApproval && (
+            {requiresSupervisor && (
               <div className="bg-yellow-100 border border-yellow-300 rounded-lg p-3 text-sm">
                 <i className="ri-alert-line text-yellow-600 mr-2"></i>
                 <span className="text-yellow-800">
@@ -227,17 +289,17 @@ export default function DecisionMakingTools({
               <option value="">{language === 'ru' ? 'Выберите причину...' : 'Select reason...'}</option>
               <optgroup label={language === 'ru' ? 'Одобрение' : 'Approval'}>
                 {approvalReasons.map(reason => (
-                  <option key={reason.value} value={reason.value}>{reason.text[language as keyof typeof reason.text]}</option>
+                  <option key={reason.value} value={reason.value}>{reason.text}</option>
                 ))}
               </optgroup>
               <optgroup label={language === 'ru' ? 'Отклонение' : 'Rejection'}>
                 {rejectionReasons.map(reason => (
-                  <option key={reason.value} value={reason.value}>{reason.text[language as keyof typeof reason.text]}</option>
+                  <option key={reason.value} value={reason.value}>{reason.text}</option>
                 ))}
               </optgroup>
               <optgroup label={language === 'ru' ? 'Проверка' : 'Inspection'}>
                 {inspectionReasons.map(reason => (
-                  <option key={reason.value} value={reason.value}>{reason.text[language as keyof typeof reason.text]}</option>
+                  <option key={reason.value} value={reason.value}>{reason.text}</option>
                 ))}
               </optgroup>
             </select>
@@ -300,7 +362,7 @@ export default function DecisionMakingTools({
         </div>
 
         {/* Approval Workflow Notice */}
-        {calculatedBenefit.requiresSupervisorApproval && (
+        {requiresSupervisor && (
           <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
             <div className="flex items-start space-x-3">
               <i className="ri-shield-user-line text-yellow-600 text-xl mt-1"></i>
