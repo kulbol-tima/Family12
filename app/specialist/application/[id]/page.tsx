@@ -1,4 +1,4 @@
-import ApplicationReview from './ApplicationReview';
+import ApplicationReview from '@/components/specialist/ApplicationReview';
 
 export async function generateStaticParams() {
   return [
