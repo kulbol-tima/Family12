@@ -201,26 +201,3 @@ export const externalIntegrations = [
 
 export const GMD_THRESHOLD = 6000; // Guaranteed minimum income threshold
 export const BASE_BENEFIT_PER_CHILD = 1200; // Base amount: 1,200 soms per child under 16
-export const SUPERVISOR_APPROVAL_THRESHOLD = 3000; // Benefits over this amount require supervisor approval
-
-export const approvalReasons = [
-    { value: 'INCOME_ELIGIBLE', text: { ru: 'Доходы соответствуют критериям', ky: 'Кирешелер талаптарга жооп берет' } },
-    { value: 'DOCUMENTS_COMPLETE', text: { ru: 'Документы полные и корректные', ky: 'Документтер толук жана туура' } },
-    { value: 'FAMILY_VERIFIED', text: { ru: 'Состав семьи подтвержден', ky: 'Үй-бүлөнүн курамы тастыкталды' } },
-    { value: 'EXTERNAL_CHECKS_PASSED', text: { ru: 'Внешние проверки пройдены', ky: 'Тышкы текшерүүлөр өттү' } }
-];
-
-export const rejectionReasons = [
-    { value: 'INCOME_EXCEEDS', text: { ru: 'Доходы превышают лимит ГМД', ky: 'Кирешелер ГМД чегинен ашат' } },
-    { value: 'INCOMPLETE_DOCUMENTS', text: { ru: 'Неполный пакет документов', ky: 'Документтердин толук эмес пакети' } },
-    { value: 'FALSE_INFORMATION', text: { ru: 'Предоставлена ложная информация', ky: 'Жалган маалымат берилген' } },
-    { value: 'NO_ELIGIBLE_CHILDREN', text: { ru: 'Нет детей до 16 лет', ky: '16 жашка чейинки балдар жок' } },
-    { value: 'DUPLICATE_APPLICATION', text: { ru: 'Дублирующая заявка', ky: 'Кайталанган арыз' } }
-];
-
-export const inspectionReasons = [
-    { value: 'HIGH_RISK', text: { ru: 'Высокий риск мошенничества', ky: 'Алдамчылыктын жогорку коркунучу' } },
-    { value: 'INCOME_VERIFICATION', text: { ru: 'Требуется проверка доходов', ky: 'Кирешелерди текшерүү талап кылынат' } },
-    { value: 'FAMILY_COMPOSITION', text: { ru: 'Проверка состава семьи', ky: 'Үй-бүлөнүн курамын текшерүү' } },
-    { value: 'LIVING_CONDITIONS', text: { ru: 'Оценка жилищных условий', ky: 'Жашоо шарттарын баалоо' } }
-];

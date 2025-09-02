@@ -13,11 +13,15 @@ export default function IncomeCalculator({ language, onIncomeChange }: IncomeCal
   const [incomes, setIncomes] = useState<Record<string, number>>({});
   const [activeCategory, setActiveCategory] = useState('primary');
 
-  const categories = Array.from(new Set(incomeCategories.map(ic => ic.category))).map(category => ({
-    id: category,
-    name: language === 'ru' ? category.charAt(0).toUpperCase() + category.slice(1) : category, // Simple i18n for now
-    color: 'blue' // Needs a better mapping
-  }));
+  const categories = [
+    { id: 'primary', name: language === 'ru' ? 'Основной доход' : 'Негизги киреше', color: 'blue' },
+    { id: 'education', name: language === 'ru' ? 'Образование' : 'Билим берүү', color: 'green' },
+    { id: 'other', name: language === 'ru' ? 'Прочие доходы' : 'Башка кирешелер', color: 'yellow' },
+    { id: 'business', name: language === 'ru' ? 'Предпринимательство' : 'Ишкердик', color: 'purple' },
+    { id: 'land', name: language === 'ru' ? 'Землевладение' : 'Жер ээлик', color: 'orange' },
+    { id: 'farming', name: language === 'ru' ? 'Подсобное хозяйство' : 'Жардамчы чарба', color: 'teal' },
+    { id: 'financial', name: language === 'ru' ? 'Финансовые инструменты' : 'Финансылык куралдар', color: 'indigo' }
+  ];
 
   const handleIncomeChange = (incomeId: string, value: number) => {
     const newIncomes = { ...incomes, [incomeId]: value };
@@ -153,6 +157,29 @@ export default function IncomeCalculator({ language, onIncomeChange }: IncomeCal
               </div>
             </div>
 
+            {/* Eligibility Indicator */}
+            <div className="mt-4 p-3 rounded-lg border-2 border-dashed">
+              {totalIncome === 0 ? (
+                <div className="text-center text-gray-500">
+                  <i className="ri-information-line mr-2"></i>
+                  {language === 'ru' ? 'Введите доходы для расчета' : 'Эсептөө үчүн кирешелерди киргизиңиз'}
+                </div>
+              ) : (
+                <div className="text-center">
+                  <div className="text-sm text-gray-600 mb-1">
+                    {language === 'ru' ? 'Предварительная оценка права на пособие' : 'Жөлөкпулга укуктун алдын ала баасы'}
+                  </div>
+                  <div className={`font-semibold ${totalIncome < 6000 ? 'text-green-600' : 'text-red-600'}`}>
+                    {totalIncome < 6000
+                      ? (language === 'ru' ? '✓ Вероятно имеет право' : '✓ Укугу бар болушу мүмкүн')
+                      : (language === 'ru' ? '✗ Превышает порог ГМД' : '✗ ГМКнын босогосун ашат')}
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {language === 'ru' ? 'Порог ГМД: 6,000 сом на человека' : 'ГМКнын босогосу: адамга 6,000 сом'}
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
