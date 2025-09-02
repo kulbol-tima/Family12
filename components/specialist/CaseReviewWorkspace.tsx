@@ -167,7 +167,6 @@ export default function CaseReviewWorkspace({ applicationId }: CaseReviewWorkspa
 
           {activeSection === 'decision' && (
             <DecisionMakingTools
-              language={language}
               application={application}
               family={family}
               onDecision={handleDecision}

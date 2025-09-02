@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react';
 import { calculateBenefit, BenefitCalculation } from '@/lib/benefitCalculator';
 import { approvalReasons, rejectionReasons, inspectionReasons } from '@/lib/mockData';
+import { useLanguage } from '@/contexts/LanguageContext';
 
 interface DecisionMakingToolsProps {
-  language: string;
   application: any;
   family: any;
   riskAssessment?: any;
@@ -13,12 +13,12 @@ interface DecisionMakingToolsProps {
 }
 
 export default function DecisionMakingTools({ 
-  language, 
   application, 
   family, 
   riskAssessment,
   onDecision 
 }: DecisionMakingToolsProps) {
+  const { language } = useLanguage();
   const [isClient, setIsClient] = useState(false);
   const [calculatedBenefit, setCalculatedBenefit] = useState<BenefitCalculation | null>(null);
   const [selectedReason, setSelectedReason] = useState('');
