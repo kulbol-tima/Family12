@@ -28,13 +28,6 @@ export default function DecisionMakingTools({
   const [comment, setComment] = useState('');
   const [requiresSupervisor, setRequiresSupervisor] = useState(false);
 
-  useEffect(() => {
-    setIsClient(true);
-    calculateBenefit();
-  }, [calculateBenefit]);
-
-  if (!isClient) return null;
-
   const calculateBenefit = useCallback(() => {
     const childrenUnder16 = application?.childrenCount || 0;
     const basePerChild = 1200;
@@ -74,6 +67,13 @@ export default function DecisionMakingTools({
     // Check if supervisor approval required for amounts > 3000
     setRequiresSupervisor(finalAmount > 3000);
   }, [application]);
+
+  useEffect(() => {
+    setIsClient(true);
+    calculateBenefit();
+  }, [calculateBenefit]);
+
+  if (!isClient) return null;
 
   const approvalReasons = [
     { value: 'INCOME_ELIGIBLE', text: language === 'ru' ? 'Доходы соответствуют критериям' : 'Income meets eligibility criteria' },
