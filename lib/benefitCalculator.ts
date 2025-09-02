@@ -1,5 +1,5 @@
 
-import { regions, GMD_THRESHOLD, BASE_BENEFIT_PER_CHILD, externalIntegrations } from './mockData';
+import { regions, GMD_THRESHOLD, BASE_BENEFIT_PER_CHILD, SUPERVISOR_APPROVAL_THRESHOLD, externalIntegrations } from './mockData';
 
 export interface FamilyMember {
   name: string;
@@ -17,6 +17,7 @@ export interface BenefitCalculation {
   borderBonus: number;
   totalMonthlyBenefit: number;
   reason?: string;
+  requiresSupervisorApproval: boolean;
 }
 
 export interface ExternalCheckResult {
@@ -48,7 +49,8 @@ export function calculateBenefit(
       regionalCoefficient: region.coefficient,
       borderBonus: 0,
       totalMonthlyBenefit: 0,
-      reason: 'No children under 16 years old'
+      reason: 'No children under 16 years old',
+      requiresSupervisorApproval: false
     };
   }
 
@@ -66,7 +68,8 @@ export function calculateBenefit(
       regionalCoefficient: region.coefficient,
       borderBonus: 0,
       totalMonthlyBenefit: 0,
-      reason: `Per capita income (${Math.round(perCapitaIncome)} сом) exceeds GMD threshold (${GMD_THRESHOLD} сом)`
+      reason: `Per capita income (${Math.round(perCapitaIncome)} сом) exceeds GMD threshold (${GMD_THRESHOLD} сом)`,
+      requiresSupervisorApproval: false
     };
   }
 
@@ -94,7 +97,8 @@ export function calculateBenefit(
     baseBenefit,
     regionalCoefficient: region.coefficient,
     borderBonus,
-    totalMonthlyBenefit: Math.round(totalMonthlyBenefit)
+    totalMonthlyBenefit: Math.round(totalMonthlyBenefit),
+    requiresSupervisorApproval: totalMonthlyBenefit > SUPERVISOR_APPROVAL_THRESHOLD
   };
 }
 

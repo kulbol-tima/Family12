@@ -1,11 +1,10 @@
 'use client';
 
-interface LanguageSwitcherProps {
-  language: string;
-  setLanguage: (lang: string) => void;
-}
+import { useLanguage } from '@/contexts/LanguageContext';
 
-export default function LanguageSwitcher({ language, setLanguage }: LanguageSwitcherProps) {
+export default function LanguageSwitcher() {
+  const { language, setLanguage } = useLanguage();
+
   return (
     <div className="flex bg-gray-100 rounded-full p-1">
       <button
