@@ -8,6 +8,6 @@ export async function generateStaticParams() {
   ];
 }
 
-export default function ApplicationReviewPage({ params }: { params: { id: string } }) {
-  return <ApplicationReview applicationId={params.id} />;
+export default function ApplicationReviewPage({ params }: PageProps) {
+  return <ApplicationReview applicationId={params.id as string} />;
 }
